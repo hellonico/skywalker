@@ -1,0 +1,41 @@
+{
+ :mvn/repos {"psiegman" {:url "https://raw.githubusercontent.com/psiegman/mvn-repo/master/releases/"}}
+
+ :paths     ["src" "src-wip" "resources"]
+ :deps      {org.clojure/clojure                 {:mvn/version "1.11.1"} ; Adjust to the desired Clojure version
+             ;dk.ative/docjure                    {:mvn/version "1.14.0"} ; Library for Excel file handling
+             ;org.clojure/data.csv                {:mvn/version "1.1.0"}
+             org.clojure/data.json               {:mvn/version "2.5.0"}
+             org.apache.logging.log4j/log4j-core {:mvn/version "2.24.3"}
+
+             hellonico/pyjama
+             {
+              ;:git/url "https://github.com/hellonico/pyjama.git"
+              ; :git/sha "50ce0f5ba7f86c6027f106d8642613e469b906ad"
+              :local/root "../pyjama"
+              }
+
+             hellonico/pyjama-io
+             {
+              ;:git/url "https://github.com/hellonico/pyjama.git"
+              ; :git/sha "50ce0f5ba7f86c6027f106d8642613e469b906ad"
+              :local/root "../pyjama-io"
+              }
+
+             }
+
+ :aliases
+ {
+  :skywalker01
+  {:exec-args {:app-name "Skywalker" :mainns pyjama.skywalker :compile [pyjama.skywalker]}}
+  :skywalker02
+  {:exec-args {:app-name "Skywalker02" :mainns pyjama.skywalker2 :compile [pyjama.skywalker2]}}
+
+  :build-tools
+  {;:exec-args {:app-name "Skywalker" :mainns pyjama.skywalker :compile [pyjama.skywalker]}
+   :deps
+   {
+    build-tools/build-tools
+    {:local/root "../build-tools"}
+    }}}
+ }
