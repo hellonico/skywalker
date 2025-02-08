@@ -63,20 +63,40 @@
     )
   )
 
-(defn answer-to-questions-with-docs
-  ([{:keys [folder-path question-file output-file] :as config}]
-   (if (not (.exists (io/as-file index-path)))
-     (index-documents folder-path))
+
+(defn play
+  ([{:keys [question-file output-file] :as config}]
    (let [questions (pyjama.io.core/load-lines-of-file question-file (or (:start config) 0))]
      (doseq [question questions]
        (->> question
             (answer-to-question-with-docs config)
             ((fn [answers] (custom-append-to-csv output-file [[(nth answers 2)]]))))))))
-(def cag answer-to-questions-with-docs)
+
+(defn replay
+  ([{:keys [question-file output-file replay] :as config}]
+   (let [existing-answers (with-open [reader (io/reader output-file)]
+                            (doall (csv/read-csv reader)))
+         output-file (if replay (str output-file ".replay.csv") output-file)
+         questions (pyjama.io.core/load-lines-of-file question-file)
+         ]
+     (doseq [[idx question] (map-indexed vector questions)]
+       (println idx)
+       (if (or (empty? replay) (some #(= idx %) replay))
+         (->> question
+              (answer-to-question-with-docs config)
+              ((fn [answers] (custom-append-to-csv output-file [[(nth answers 2)]]))))
+         (custom-append-to-csv output-file [[(second (nth existing-answers idx))]]))))))
+
+(defn cag [config]
+  (if (not (.exists (io/as-file index-path)))
+    (index-documents (:folder-path config)))
+  (if (:replay config)
+    (replay config) (play config)
+    ))
 
 (defn -main [& args]
   (let [settings (pyo/read-settings
-                   (or (first args) "skywalker20/settings.edn"))
+                   (or (first args) "skywalker20/02_settings.edn"))
         settings (assoc settings :start-time (Date.))]
     (println ascii "\n")
     (pyjama.io.print/pretty-print-map settings)

@@ -1,4 +1,4 @@
-(ns pyjama.scorer
+(ns pyjama.personal
   (:require [clojure.data.csv :as csv]
             [clojure.java.io :as io]
             [pyjama.functions]))
