@@ -11,7 +11,7 @@
          doall)))
 
 (defn -main [& args]
-  (-> "skywalker20/scoring_02.csv"
+  (-> "skywalker20/02_scoring.csv"
       (filter-ids)
       (vec)
       (println)))
