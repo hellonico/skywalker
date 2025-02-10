@@ -4,7 +4,6 @@
     [clojure.data.csv :as csv]
     [clojure.java.io :as io]
     [clojure.pprint]
-    [clojure.string :as str]
     [pyjama.chatgpt.core]
     [pyjama.functions :refer [ollama-fn]]
     [pyjama.io.core :as pyo]
@@ -23,13 +22,6 @@
     (with-open [writer (io/writer output-file :append true)]
       (csv/write-csv writer (map #(cons line-number %) object)))))
 
-(defn augmented-text [best-pdf keywords strategy]
-  (condp = strategy
-    :sentences (str/join "\n" (extract-relevant-sentences-in-doc best-pdf keywords))
-    :parts (extract-relevant-text-parts best-pdf keywords)
-    :full (slurp best-pdf)
-    (throw (Exception. "Invalid strategy"))))
-
 (defn answer-to-question-with-docs
   "use the clucy index"
   [config question]
@@ -42,6 +34,9 @@
 
         ; Ollama
         answer ((ollama-fn (:answerer config)) [augmented question])
+        use-shortener (not (nil? (:shortener config)))
+
+        shortener (if use-shortener ((ollama-fn (:shortener config)) answer) answer)
 
         ; ChatGPT works too
         ;answer (pyjama.chatgpt.core/chatgpt
@@ -49,7 +44,6 @@
         ;          :pre    "以下の文が与えられています: %s. できるだけ正確に質問 %s に日本語で答えてください。文書のサイズは200文字以下。"
         ;          :prompt [augmented question]})
         ]
-
 
     (println best-pdf)
     ;
@@ -59,7 +53,10 @@
 
     (println answer)
 
-    [question best-pdf answer]
+    (println "Shortener:" use-shortener)
+    (println shortener)
+
+    [question best-pdf shortener]
     )
   )
 
@@ -76,11 +73,13 @@
   ([{:keys [question-file output-file replay] :as config}]
    (let [existing-answers (with-open [reader (io/reader output-file)]
                             (doall (csv/read-csv reader)))
-         output-file (if replay (str output-file ".replay.csv") output-file)
+         ;output-file (if replay (str output-file ".replay.csv") output-file)
          questions (pyjama.io.core/load-lines-of-file question-file)
          ]
+     (when (.exists (io/as-file output-file))
+       (spit output-file ""))                               ; blank replay file
      (doseq [[idx question] (map-indexed vector questions)]
-       (println idx)
+       (println "Replay ->" idx)
        (if (or (empty? replay) (some #(= idx %) replay))
          (->> question
               (answer-to-question-with-docs config)
@@ -88,16 +87,19 @@
          (custom-append-to-csv output-file [[(second (nth existing-answers idx))]]))))))
 
 (defn cag [config]
-  (if (not (.exists (io/as-file index-path)))
+  (if (or
+        (not (.exists (io/as-file index-path)))
+        (:index config))
     (index-documents (:folder-path config)))
   (if (:replay config)
-    (replay config) (play config)
-    ))
+    (replay config) (play config)))
 
 (defn -main [& args]
-  (let [settings (pyo/read-settings
-                   (or (first args) "skywalker20/02_settings.edn"))
-        settings (assoc settings :start-time (Date.))]
+  (let [config-file (or (first args) "skywalker21/settings.edn")
+        settings (pyo/read-settings config-file)
+        settings (assoc settings
+                   :start-time (Date.)
+                   :config-file config-file)]
     (println ascii "\n")
     (pyjama.io.print/pretty-print-map settings)
     (cag settings)))
