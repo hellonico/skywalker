@@ -95,7 +95,7 @@
     (replay config) (play config)))
 
 (defn -main [& args]
-  (let [config-file (or (first args) "skywalker21/settings.edn")
+  (let [config-file (or (first args) "skywalker20/settings.edn")
         settings (pyo/read-settings config-file)
         settings (assoc settings
                    :start-time (Date.)
