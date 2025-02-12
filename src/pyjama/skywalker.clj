@@ -1,12 +1,11 @@
 (ns pyjama.skywalker
   (:gen-class)
-  (:require [clojure.java.io :as io]
-            [pyjama.best]
+  (:require [pyjama.best]
             [pyjama.core]
             [pyjama.functions]
             [pyjama.io.cache]
-            [pyjama.io.print]
             [pyjama.io.core :as pyo]
+            [pyjama.io.print]
             [pyjama.io.readers])
   (:import (java.util Date)))
 
@@ -20,7 +19,7 @@
   (let [questions (pyo/load-lines-of-file (or (:questions settings) (str folder "/questions.txt")))
         documents (pyo/load-files-from-folders (:docs settings) #{"docx" "pdf" "txt" "epub" "md"})
         best-file (str folder "/best.edn")
-        best-docs (if (and reuse-scoring (.exists (io/as-file best-file))) ; reuse a previous scoring run
+        best-docs (if (and reuse-scoring (pyjama.io.core/file-exists? best-file)) ; reuse a previous scoring run
                     (pyo/load-best-documents (str folder "/best.edn"))
                     (->>
                       (pyjama.best/best-documents

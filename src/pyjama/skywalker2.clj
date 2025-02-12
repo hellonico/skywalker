@@ -1,4 +1,11 @@
 (ns pyjama.skywalker2
+  "Use lucene to search for the proper document. Depending on the strategy insert
+  :sentences
+  :full text
+  :parts
+  of the best document in the context to answer the question.
+  Requires a large context but works pretty nicely.
+  "
   (:gen-class)
   (:require
     [clojure.data.csv :as csv]

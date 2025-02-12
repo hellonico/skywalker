@@ -19,6 +19,7 @@
          :pre    "Read carefully this document %s.\n How relevant is the text to answer the following question, read question carefully and be aware of context: %s. Give a score between 1 and 100."})))
 
 (defn best-documents
+  "Give a score to each documents, related to the question."
   [questions documents extract-text-fn settings]
   (let [urls (clojure.string/split (:url settings) #",")    ;; Always a vector of URLs
         url-count (count urls)
