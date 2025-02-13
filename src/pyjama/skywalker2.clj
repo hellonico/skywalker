@@ -37,7 +37,7 @@
         _ (println keywords)
         best-pdf (:doc (best-matching-document keywords))
 
-        augmented (augmented-text best-pdf keywords (:augmented-stategy config))
+        augmented (augmented-text best-pdf keywords (:augmented-strategy config))
 
         ; Ollama
         answer ((ollama-fn (:answerer config)) [augmented question])
