@@ -20,7 +20,7 @@
         padded-outputs (take (count questions) (concat outputs (repeat "")))
         ]
     (swap! state assoc
-           :edn-file (.getAbsolutePath edn-file)
+           :edn-file edn-file
            :processing false
            :rows (map-indexed (fn [idx [q o]] {:index idx :question q :answer o})
                               (map

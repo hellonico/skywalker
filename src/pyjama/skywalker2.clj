@@ -11,7 +11,7 @@
     [clojure.data.csv :as csv]
     [clojure.java.io :as io]
     [clojure.pprint]
-    [pyjama.chatgpt.core]
+    [pyjama.chatgpt.chatgpt]
     [pyjama.functions :refer [ollama-fn]]
     [pyjama.io.core :as pyo]
     [pyjama.io.indexing :refer :all]
