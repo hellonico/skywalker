@@ -121,9 +121,7 @@
 (def renderer
   (fx/create-renderer
     :middleware (fx/wrap-map-desc assoc :fx/type table-view)
-    :opts {:state                    state
-           :fx.opt/map-event-handler handle-event
-           }))
+    :opts {:fx.opt/map-event-handler handle-event}))
 
 (defn -main []
   (pyjama.config/shutdown-and-startup "skywalker2" state)
